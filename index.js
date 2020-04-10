@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const todosRouters = require("./routes/todos");
 const exphbs = require("express-handlebars");
+const path = require("path");
 const {
   parsed: { PORT, DB },
 } = require("./config/config");
@@ -12,8 +14,17 @@ const hbs = exphbs.create({
 });
 
 app.engine("hbs", hbs.engine);
+
 app.set("view engine", "hbs");
 app.set("views", "views");
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+app.use(express.static(path.join(__dirname, "public")));
+app.use(todosRouters);
 
 const server = async () => {
   try {
@@ -26,9 +37,7 @@ const server = async () => {
       console.log(`server has been started on port ${PORT}!`)
     );
   } catch (e) {
-    console.log(e);
+    throw e;
   }
 };
 server();
-
-app.get("/", (req, res) => res.send("Hello World!"));
